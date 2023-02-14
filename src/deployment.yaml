@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {deployment.name}
+  labels:
+    app: {deployment.name}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {deployment.name}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {deployment.name}
+    spec:
+      containers:
+      - image: {image}
+        name: mysql
+        args: ["--default-authentication-plugin=mysql_native_password", "--skip-log-bin"]
+        env:
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {secret.name}
+              key: MYSQL_PASSWORD
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: {secret.name}
+              key: MYSQL_USER
+        - name: MYSQL_DATABASE
+          value: {database}
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {secret.name}
+              key: MYSQL_ROOT_PASSWORD
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: {host_path.name}
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: {host_path.name}
+        hostPath:
+          path: {host_path.mount_path}
+          type: DirectoryOrCreate
