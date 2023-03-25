@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {deployment.name}
+  name: {name}
   labels:
-    app: {deployment.name}
+    app: {name}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {deployment.name}
+      app: {name}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: {deployment.name}
+        app: {name}
     spec:
       containers:
       - image: {image}
@@ -24,28 +24,28 @@ spec:
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {secret.name}
+              name: {name}-secret
               key: MYSQL_PASSWORD
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:
-              name: {secret.name}
+              name: {name}-secret
               key: MYSQL_USER
         - name: MYSQL_DATABASE
           value: {database}
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {secret.name}
+              name: {name}-secret
               key: MYSQL_ROOT_PASSWORD
         ports:
         - containerPort: 3306
           name: mysql
         volumeMounts:
-        - name: {host_path.name}
+        - name: {name}-hostpath
           mountPath: /var/lib/mysql
       volumes:
-      - name: {host_path.name}
+      - name: {name}-hostpath
         hostPath:
-          path: {host_path.mount_path}
+          path: {hostpath}
           type: DirectoryOrCreate
